@@ -18,7 +18,7 @@ locals {
     },
 
     {
-      name : "sn-example-endpoints"
+      name : "sn-endpoints"
       address_prefixes : ["10.255.0.64/26"]
       enforce_private_link_endpoint_network_policies : false
       enforce_private_link_service_network_policies : false
@@ -35,7 +35,7 @@ locals {
       }
     },
     {
-      name : "sn-example-services"
+      name : "sn-services"
       address_prefixes : ["10.255.0.128/25"]
       enforce_private_link_endpoint_network_policies : true
       enforce_private_link_service_network_policies : false
