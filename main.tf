@@ -59,7 +59,7 @@ module "network" {
   if subnet.name != "GatewaySubnet" && subnet.name != "AzureFirewallSubnet" && subnet.name != "AzureFirewallManagementSubnet" && subnet.name != "AzureBastionSubnet" && subnet.name != "RouteServerSubnet" }
   source                 = "Azure/naming/azurerm"
   version                = "0.1.1"
-  suffix                 = [replace(replace(join("", (each.value.address_prefixes)), ".", "_"), "/", "__")]
+  prefix                 = [replace(replace(join("", (each.value.address_prefixes)), ".", "_"), "/", "__")]
   unique-length          = 12
   unique-include-numbers = true
 }
