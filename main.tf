@@ -57,11 +57,11 @@ locals {
 module "network" {
   for_each = { for subnet in local.subnets : subnet.name => subnet
   if subnet.name != "GatewaySubnet" && subnet.name != "AzureFirewallSubnet" && subnet.name != "AzureFirewallManagementSubnet" && subnet.name != "AzureBastionSubnet" && subnet.name != "RouteServerSubnet" }
-  source  = "Azure/naming/azurerm"
-  version = "0.1.1"
-  suffix  = [replace(replace(join("", (each.value.address_prefixes)), ".", "_"), "/", "__")]
-  # unique-length          = 8
-  # unique-include-numbers = true
+  source                 = "Azure/naming/azurerm"
+  version                = "0.1.1"
+  suffix                 = [replace(replace(join("", (each.value.address_prefixes)), ".", "_"), "/", "__")]
+  unique-length          = 0
+  unique-include-numbers = true
 }
 
 output "subnet_suffix" {
