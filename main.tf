@@ -65,11 +65,11 @@ module "network" {
   unique-include-numbers = true
 }
 
-# data "azurerm_client_config" "this" {}
+data "azurerm_client_config" "this" {}
 
-# output "subscription_id" {
-#   value = data.azurerm_client_config.this.subscription_id
-# }
+output "subscription_id" {
+  value = data.azurerm_client_config.this.subscription_id
+}
 
 output "subnet_suffix" {
   value = [for type in module.network : type.subnet.name_unique]
