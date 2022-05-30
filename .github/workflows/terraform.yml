@@ -97,3 +97,18 @@ jobs:
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: terraform apply -auto-approve -input=false apply.tfplan
+
+  output:
+    runs-on: ubuntu-latest
+    environment: production
+    
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
+
+
