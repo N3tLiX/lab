@@ -114,3 +114,17 @@ jobs:
           ls ${{ github.workspace }}
 
 
+  test:
+    name: 'Testing'
+    needs: [terraform,output]
+    runs-on: ubuntu-latest
+    environment: production
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
