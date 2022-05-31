@@ -33,16 +33,19 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.ARM_CLIENT_ID }}
-          tenant-id: ${{ secrets.ARM_TENANT_ID }}
-          subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      - name: Terraform Apply
+        run: az --version
 
-      - name: "azurerm"
-        uses: azure/CLI@v1
-        with:
-          azcliversion: 2.30.0
-          inlineScript: |
-            az --version # source ../scripts/azurerm.sh
+      # - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
+      #   uses: azure/login@v1
+      #   with:
+      #     client-id: ${{ secrets.ARM_CLIENT_ID }}
+      #     tenant-id: ${{ secrets.ARM_TENANT_ID }}
+      #     subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+
+      # - name: "azurerm"
+      #   uses: azure/CLI@v1
+      #   with:
+      #     azcliversion: 2.30.0
+      #     inlineScript: |
+      #       az --version # source ../scripts/azurerm.sh
