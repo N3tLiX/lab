@@ -60,21 +60,30 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     env:
-      TF_STATE_BLOB_SUBSCRIPTION_NAME: ""
-      TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP: ""
-      TF_STATE_BLOB_ACCOUT_LOCATION: ""
-      TF_STATE_BLOB_ACCOUNT_NAME: ""
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+      TF_STATE_BLOB_SUBSCRIPTION_NAME: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP: "rg-TERRAFORM-GITACTION-DEV"
+      TF_STATE_BLOB_ACCOUT_LOCATION: "westeurope"
+      TF_STATE_BLOB_ACCOUNT_NAME: "sa202105311dev"
       TF_STATE_BLOB_ACCOUNT_SKU: ""
-      TF_STATE_BLOB_CONTAINER_NAME: ""
+      TF_STATE_BLOB_CONTAINER_NAME: "tfstate"
 
     defaults:
       run:
         shell: bash
 
     steps:
-      - name: List files in the repository
-        run: |
-          ls ${{ github.workspace }}
+      - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
+          uses: azure/login@v1
+          with:
+            client-id: ${{ secrets.AZURE_CLIENT_ID }}
+            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }} 
+            enable-AzPSSession: true
  
   terraform:
     name: 'Terraform'
