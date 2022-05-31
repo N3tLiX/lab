@@ -29,7 +29,7 @@ jobs:
           az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
           az account set --subscription $ARM_SUBSCRIPTION_ID
           source ${{github.workspace}}/scripts/azurerm.sh
-        env:
+        with:
           TF_STATE_BLOB_SUBSCRIPTION_NAME: ${{ secrets.ARM_SUBSCRIPTION_ID }}
           TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP: ${{ secrets.TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP }}
           TF_STATE_BLOB_ACCOUT_LOCATION: ${{ secrets.TF_STATE_BLOB_ACCOUT_LOCATION }}
