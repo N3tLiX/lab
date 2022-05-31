@@ -37,7 +37,25 @@ jobs:
         run: |
           az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
           az account set --subscription $ARM_SUBSCRIPTION_ID
-          source scripts/azurerm.sh
+          # source scripts/azurerm.sh
+          echo "Checking if [$TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP] resource group actually exists in the [$TF_STATE_BLOB_SUBSCRIPTION_NAME] subscription..."
+          az group show --name $TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP #&> /dev/null
+          if [[ $? != 0 ]]; then
+            echo "No [$TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP] resource group actually exists in the [$TF_STATE_BLOB_SUBSCRIPTION_NAME] subscription"
+            echo "Creating [$TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP] resource group in the [$TF_STATE_BLOB_SUBSCRIPTION_NAME] subscription..."
+            az group create \
+              --location $TF_STATE_BLOB_ACCOUT_LOCATION \
+              --name $TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP #&> /dev/null
+            if [[ $? == 0 ]]; then
+              echo "[$TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP] resource group successfully created in the [$TF_STATE_BLOB_SUBSCRIPTION_NAME] subscription"
+            else
+              echo "Failed to create [$TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP] resource group in the [$TF_STATE_BLOB_SUBSCRIPTION_NAME] subscription"
+              echo "##vso[task.setvariable variable=succeeded;isOutput=true;]false"
+              exit -1
+            fi
+          else
+          	echo "[$TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP] resource group already exists in the [$TF_STATE_BLOB_SUBSCRIPTION_NAME] subscription"
+          fi
 
       # - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
       #   uses: azure/login@v1
