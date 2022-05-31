@@ -40,7 +40,7 @@ jobs:
       - name: "Variables"
         shell: "/bin/bash {0}"
         run: |
-          echo -n "SAS_TOKEN : [$SAS_TOKEN]
+          echo -n "SAS_TOKEN : [$SAS_TOKEN]"
         env:
           SAS_TOKEN: ${{ steps.azurerm.outputs.SasToken }}
 
