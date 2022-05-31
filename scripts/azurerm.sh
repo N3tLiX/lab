@@ -18,13 +18,13 @@ echo "TF_STATE_BLOB_ACCOUNT_SKU            : [$TF_STATE_BLOB_ACCOUNT_SKU]"
 echo "TF_STATE_BLOB_CONTAINER_NAME         : [$TF_STATE_BLOB_CONTAINER_NAME]"
 
 echo "Checking if [$TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP] resource group actually exists in the [$TF_STATE_BLOB_SUBSCRIPTION_NAME] subscription..."
-az group show --name $TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP &> /dev/null
+az group show --name $TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP #&> /dev/null
 if [[ $? != 0 ]]; then
   echo "No [$TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP] resource group actually exists in the [$TF_STATE_BLOB_SUBSCRIPTION_NAME] subscription"
   echo "Creating [$TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP] resource group in the [$TF_STATE_BLOB_SUBSCRIPTION_NAME] subscription..."
   az group create \
     --location $TF_STATE_BLOB_ACCOUT_LOCATION \
-    --name $TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP &> /dev/null
+    --name $TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP #&> /dev/null
   if [[ $? == 0 ]]; then
     echo "[$TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP] resource group successfully created in the [$TF_STATE_BLOB_SUBSCRIPTION_NAME] subscription"
   else
@@ -37,7 +37,7 @@ else
 fi
 
 echo "Checking if [$TF_STATE_BLOB_ACCOUNT_NAME] storage account actually exists in the [$TF_STATE_BLOB_SUBSCRIPTION_NAME] subscription..."
-az storage account show --resource-group $TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP --name $TF_STATE_BLOB_ACCOUNT_NAME &> /dev/null
+az storage account show --resource-group $TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP --name $TF_STATE_BLOB_ACCOUNT_NAME #&> /dev/null
 if [[ $? != 0 ]]; then
   echo "No [$TF_STATE_BLOB_ACCOUNT_NAME] storage account actually exists in the [$TF_STATE_BLOB_SUBSCRIPTION_NAME] subscription"
   echo "Creating [$TF_STATE_BLOB_ACCOUNT_NAME] storage account in the [$TF_STATE_BLOB_SUBSCRIPTION_NAME] subscription..."
@@ -50,7 +50,7 @@ if [[ $? != 0 ]]; then
     --min-tls-version TLS1_2 \
     --routing-choice MicrosoftRouting \
     --publish-microsoft-endpoints true \
-    --sku $TF_STATE_BLOB_ACCOUNT_SKU &> /dev/null
+    --sku $TF_STATE_BLOB_ACCOUNT_SKU #&> /dev/null
   if [[ $OSTYPE == 'darwin'* ]]; then
     END=`date -v+30M '+%Y-%m-%dT%H:%MZ'`
   else
@@ -62,7 +62,7 @@ if [[ $? != 0 ]]; then
   --services b \
   --resource-types sco \
   --expiry $END \
-  --only-show-errors -o tsv) &> /dev/null
+  --only-show-errors -o tsv) #&> /dev/null
   if [[ $? == 0 ]]; then
     echo "[$TF_STATE_BLOB_ACCOUNT_NAME] storage account successfully created in the [$TF_STATE_BLOB_SUBSCRIPTION_NAME] subscription"
   else
@@ -83,18 +83,18 @@ else
   --services b \
   --resource-types sco \
   --expiry $END \
-  --only-show-errors -o tsv) &> /dev/null
+  --only-show-errors -o tsv) #&> /dev/null
 fi
 
 echo "Checking if [$TF_STATE_BLOB_CONTAINER_NAME] blob container actually exists in the [$TF_STATE_BLOB_ACCOUNT_NAME] storage account..."
-az storage container show --account-name $TF_STATE_BLOB_ACCOUNT_NAME --name $TF_STATE_BLOB_CONTAINER_NAME --sas-token $TF_STATE_BLOB_SAS_TOKEN &> /dev/null 
+az storage container show --account-name $TF_STATE_BLOB_ACCOUNT_NAME --name $TF_STATE_BLOB_CONTAINER_NAME --sas-token $TF_STATE_BLOB_SAS_TOKEN #&> /dev/null 
 if [[ $? != 0 ]]; then
   echo "No [$TF_STATE_BLOB_CONTAINER_NAME] blob container actually exists in [$TF_STATE_BLOB_ACCOUNT_NAME] storage account"
   echo "Creating [$TF_STATE_BLOB_CONTAINER_NAME] blob container in [$TF_STATE_BLOB_ACCOUNT_NAME] storage account..."
   az storage container create \
     --name $TF_STATE_BLOB_CONTAINER_NAME \
     --account-name $TF_STATE_BLOB_ACCOUNT_NAME \
-    --sas-token $TF_STATE_BLOB_SAS_TOKEN &> /dev/null
+    --sas-token $TF_STATE_BLOB_SAS_TOKEN #&> /dev/null
   if [[ $? == 0 ]]; then
     echo "[$TF_STATE_BLOB_CONTAINER_NAME] blob container successfully created in [$TF_STATE_BLOB_ACCOUNT_NAME] storage account"
   else
