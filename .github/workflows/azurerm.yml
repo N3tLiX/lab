@@ -37,9 +37,10 @@ jobs:
           source ${{github.workspace}}/scripts/azurerm.sh
         id: azurerm
 
-      - name: "Create"
+      - name: "Variables"
         shell: "/bin/bash {0}"
-        run: echo -n "SAS_TOKEN : [$SAS_TOKEN]
+        run: |
+          echo -n "SAS_TOKEN : [$SAS_TOKEN]
         with:
           SAS_TOKEN: ${{ steps.azurerm.outputs.SasToken }}
 
