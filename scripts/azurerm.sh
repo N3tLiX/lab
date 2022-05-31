@@ -105,8 +105,13 @@ if [[ $? != 0 ]]; then
 else
 	echo "[$TF_STATE_BLOB_CONTAINER_NAME] blob container already exists in [$TF_STATE_BLOB_ACCOUNT_NAME] storage account"
 fi
+# Azure DevOps output
 echo "##vso[task.setvariable variable=SubscriptionName;isOutput=true;]$TF_STATE_BLOB_SUBSCRIPTION_NAME"
-echo "##vso[task.setvariable variable=StorageAccountName;isOutput=true;]$TF_STATE_BLOB_ACCOUNT_NAME"
+echo "##vso[task.setvariable variable=AccountName;isOutput=true;]$TF_STATE_BLOB_ACCOUNT_NAME"
 echo "##vso[task.setvariable variable=BlobContainer;isOutput=true;]$TF_STATE_BLOB_CONTAINER_NAME"
 echo "##vso[task.setvariable variable=SasToken;isOutput=true;]$TF_STATE_BLOB_SAS_TOKEN"
-echo "##vso[task.setvariable variable=succeeded;isOutput=true;]true"
+# GitHub Action output
+echo "::set-output name=SubscriptionName::$TF_STATE_BLOB_SAS_TOKEN"
+echo "::set-output name=AccountName::$TF_STATE_BLOB_SAS_TOKEN"
+echo "::set-output name=BlobContainer::$TF_STATE_BLOB_SAS_TOKEN"
+echo "::set-output name=SasToken::$TF_STATE_BLOB_SAS_TOKEN"
