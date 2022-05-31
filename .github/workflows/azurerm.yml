@@ -26,18 +26,15 @@ jobs:
       TF_STATE_BLOB_ACCOUNT_SKU: "Standard_LRS"
       TF_STATE_BLOB_CONTAINER_NAME: "tfstate"
 
-    defaults:
-      run:
-        shell: bash
-
     steps:
       - uses: actions/checkout@v1
 
       - name: "Create"
+        shell: "/bin/bash {0}"
         run: |
           az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
           az account set --subscription $ARM_SUBSCRIPTION_ID
-          source scripts/azurerm.sh
+          source ${{github.workspace}}/scripts/azurerm.sh
 
       # - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
       #   uses: azure/login@v1
