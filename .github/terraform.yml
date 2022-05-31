@@ -54,34 +54,8 @@ permissions:
   contents: read
 
 jobs:
-  azurerm:
-    name: "Create Backend"
-    runs-on: ubuntu-latest
-    environment: production
-    env:
-      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-
-      TF_STATE_BLOB_SUBSCRIPTION_NAME: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-      TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP: "rg-TERRAFORM-GITACTION-DEV"
-      TF_STATE_BLOB_ACCOUT_LOCATION: "westeurope"
-      TF_STATE_BLOB_ACCOUNT_NAME: "sa202105311dev"
-      TF_STATE_BLOB_ACCOUNT_SKU: ""
-      TF_STATE_BLOB_CONTAINER_NAME: "tfstate"
-
-    steps:
-      - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.ARM_CLIENT_ID }}
-          tenant-id: ${{ secrets.ARM_TENANT_ID }}
-          subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-
   terraform:
     name: "Terraform"
-    needs: [azurerm]
     runs-on: ubuntu-latest
     environment: production
     env:
@@ -123,7 +97,7 @@ jobs:
 
   output:
     name: "Deployment Output"
-    needs: [terraform, azurerm]
+    needs: [terraform]
     runs-on: ubuntu-latest
     environment: production
 
@@ -138,7 +112,7 @@ jobs:
 
   test:
     name: "Testing"
-    needs: [terraform, output, azurerm]
+    needs: [terraform, output]
     runs-on: ubuntu-latest
     environment: production
 
@@ -153,7 +127,7 @@ jobs:
 
   report:
     name: "Report"
-    needs: [terraform, azurerm]
+    needs: [terraform]
     runs-on: ubuntu-latest
     environment: production
 
