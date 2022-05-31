@@ -42,5 +42,7 @@ jobs:
         shell: "/bin/bash {0}"
         run: |
           echo -n "SAS_TOKEN : [$SAS_TOKEN]"
+          FOO="${{ github.event.inputs.foo }}"
+          echo -n "FOO       : [${FOO}]" >> $GITHUB_ENV
         env:
           SAS_TOKEN: ${{ steps.azurerm.outputs.SasToken }}
