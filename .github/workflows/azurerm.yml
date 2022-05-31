@@ -38,9 +38,7 @@ jobs:
           az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
           az account set --subscription $ARM_SUBSCRIPTION_ID
           # source scripts/azurerm.sh
-          echo "Checking if [$TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP] resource group actually exists in the [$TF_STATE_BLOB_SUBSCRIPTION_NAME] subscription..."
-          az group show --name $TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP #&> /dev/null
-          echo $?
+          which bash
 
       # - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
       #   uses: azure/login@v1
