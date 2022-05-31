@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 for ARGUMENT in "$@"
 do
