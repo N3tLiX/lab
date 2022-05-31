@@ -33,10 +33,11 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - name: "Login"
+      - name: "Create"
         run: |
           az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
           az account set --subscription $ARM_SUBSCRIPTION_ID
+          source ../../scripts/azurerm.sh
 
       # - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
       #   uses: azure/login@v1
