@@ -33,8 +33,10 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - name: Terraform Apply
-        run: az --version
+      - name: "Login"
+        run: |
+        az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
+        az account set --subscription $ARM_SUBSCRIPTION_ID
 
       # - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
       #   uses: azure/login@v1
