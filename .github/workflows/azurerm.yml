@@ -44,4 +44,5 @@ jobs:
         uses: azure/CLI@v1
         with:
           azcliversion: 2.30.0
-        run: az --version # source ../scripts/azurerm.sh
+          inlineScript: |
+            az --version # source ../scripts/azurerm.sh
