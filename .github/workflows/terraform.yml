@@ -42,21 +42,20 @@
 #       with:
 #         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-name: 'Terraform'
+name: "Terraform"
 
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
 
 permissions:
   contents: read
 
-jobs: 
-
+jobs:
   azurerm:
-    name: 'Create Backend'
+    name: "Create Backend"
     runs-on: ubuntu-latest
     environment: production
     env:
@@ -78,15 +77,15 @@ jobs:
 
     steps:
       - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
-          uses: azure/login@v1
-          with:
-            client-id: ${{ secrets.AZURE_CLIENT_ID }}
-            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }} 
-            enable-AzPSSession: true
- 
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+
   terraform:
-    name: 'Terraform'
+    name: "Terraform"
     needs: [azurerm]
     runs-on: ubuntu-latest
     environment: production
@@ -101,34 +100,34 @@ jobs:
         shell: bash
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
-      with:
-        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-    
-    - name: Terraform Init
-      run: terraform init
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
-    - name: Terraform Format
-      run: terraform fmt -check
+      - name: Terraform Init
+        run: terraform init
 
-    - name: Terraform Plan
-      run: terraform plan -input=false -out apply.tfplan
+      - name: Terraform Format
+        run: terraform fmt -check
 
-    - uses: actions/upload-artifact@v3
-      with:
-        name: apply.tfplan
-        path:  apply.tfplan
+      - name: Terraform Plan
+        run: terraform plan -input=false -out apply.tfplan
 
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: terraform apply -auto-approve -input=false apply.tfplan
+      - uses: actions/upload-artifact@v3
+        with:
+          name: apply.tfplan
+          path: apply.tfplan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false apply.tfplan
 
   output:
-    name: 'Deployment Output'
+    name: "Deployment Output"
     needs: [terraform, azurerm]
     runs-on: ubuntu-latest
     environment: production
@@ -142,10 +141,9 @@ jobs:
         run: |
           ls ${{ github.workspace }}
 
-
   test:
-    name: 'Testing'
-    needs: [terraform,output,azurerm]
+    name: "Testing"
+    needs: [terraform, output, azurerm]
     runs-on: ubuntu-latest
     environment: production
 
@@ -159,8 +157,8 @@ jobs:
           ls ${{ github.workspace }}
 
   report:
-    name: 'Report'
-    needs: [terraform,azurerm]
+    name: "Report"
+    needs: [terraform, azurerm]
     runs-on: ubuntu-latest
     environment: production
 
