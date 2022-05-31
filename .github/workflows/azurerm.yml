@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - name: "create: [azurerm]"
+      - name: "create [azurerm]"
         shell: "/bin/bash {0}"
         run: |
           az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
@@ -38,7 +38,7 @@ jobs:
           TF_STATE_BLOB_CONTAINER_NAME: ${{ secrets.TF_STATE_BLOB_CONTAINER_NAME }}
         id: azurerm
 
-      - name: "calidate: [azurerm]"
+      - name: "validate [azurerm]"
         shell: "/bin/bash {0}"
         run: |
           echo -n "SAS_TOKEN : [$SAS_TOKEN]"
