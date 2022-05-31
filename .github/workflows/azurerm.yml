@@ -41,7 +41,7 @@ jobs:
         shell: "/bin/bash {0}"
         run: |
           echo -n "SAS_TOKEN : [$SAS_TOKEN]
-        with:
+        env:
           SAS_TOKEN: ${{ steps.azurerm.outputs.SasToken }}
 
       # - name: OIDC Login to Azure Public Cloud with AzPowershell (enableAzPSSession true)
