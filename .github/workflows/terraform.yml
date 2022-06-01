@@ -115,14 +115,14 @@ jobs:
           name: ${{github.run_id}}.tfplan
           path: ${{github.workspace}}/${{github.run_id}}.tfplan
 
-      # apply:
-      #   name: "apply"
-      #   needs: [azurerm, terraform]
-      #   runs-on: ubuntu-latest
-      #   environment: development
+  apply:
+    name: "apply"
+    needs: [azurerm, terraform]
+    runs-on: ubuntu-latest
+    environment: development
 
-      #   steps:
-      #     - uses: actions/checkout@v1
+    steps:
+      - uses: actions/checkout@v1
       #     - name: "Set environment variables and get the SAS Token"
       #       shell: "/bin/bash {0}"
       #       run: |
