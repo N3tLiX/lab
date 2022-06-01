@@ -72,21 +72,18 @@ jobs:
           echo "::set-output name=storage_account_name::$TF_STATE_BLOB_ACCOUNT_NAME"
           echo "::set-output name=container_name::$TF_STATE_BLOB_CONTAINER_NAME"
           echo "::set-output name=key::$TF_STATE_BLOB_FILE"
+          echo "::set-output name=tf_actions_version::$(curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | jq -r '.tag_name' | sed 's/^v//')"
         id: azurerm
-      - name: 'Get latest Terraform GitHub release and remove "v" from tag name for version'
-        run: "echo ::set-output name=tf_actions_version::$(curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | jq -r '.tag_name' | sed 's/^v//')"
-        shell: bash
-        id: get_tf_latest
       - name: "Terraform Format"
         uses: hashicorp/terraform-github-actions@master
         with:
-          tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
+          tf_actions_version: ${{ steps.azurerm.outputs.tf_actions_version }}
           tf_actions_subcommand: "fmt"
           tf_actions_working_dir: ${{github.workspace}}
       - name: "Terraform Init"
         uses: hashicorp/terraform-github-actions@master
         with:
-          tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
+          tf_actions_version: ${{ steps.azurerm.outputs.tf_actions_version }}
           tf_actions_subcommand: "init"
           tf_actions_working_dir: ${{github.workspace}}
           args: |
@@ -98,19 +95,34 @@ jobs:
       - name: "Terraform Validate"
         uses: hashicorp/terraform-github-actions@master
         with:
-          tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
+          tf_actions_version: ${{ steps.azurerm.outputs.tf_actions_version }}
           tf_actions_subcommand: "validate"
           tf_actions_working_dir: ${{github.workspace}}
-      - name: "Terraform Plan"
+      - name: "Terraform Plan [apply|"
+        if: github.ref == 'refs/heads/dev'
         uses: hashicorp/terraform-github-actions@master
         with:
-          tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
+          tf_actions_version: ${{ steps.azurerm.outputs.tf_actions_version }}
           tf_actions_subcommand: "plan"
           tf_actions_working_dir: ${{github.workspace}}
           args: "-input=false -out ${{github.run_id}}.apply.tfplan"
+      - name: "Terraform Plan [destroy]"
+        if: github.ref == 'refs/heads/destroy'
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: ${{ steps.azurerm.outputs.tf_actions_version }}
+          tf_actions_subcommand: "plan"
+          tf_actions_working_dir: ${{github.workspace}}
+          args: "- destroy -input=false -out ${{github.run_id}}.destroy.tfplan"
       - uses: actions/upload-artifact@v3
+        if: github.ref == 'refs/heads/dev'
         with:
           name: ${{github.run_id}}.apply.tfplan
+          path: ${{github.workspace}}/${{github.run_id}}.apply.tfplan
+      - uses: actions/upload-artifact@v3
+        if: github.ref == 'refs/heads/destroy'
+        with:
+          name: ${{github.run_id}}.destroy.tfplan
           path: ${{github.workspace}}/${{github.run_id}}.apply.tfplan
 
   tf_apply:
@@ -138,18 +150,15 @@ jobs:
           echo "::set-output name=storage_account_name::$TF_STATE_BLOB_ACCOUNT_NAME"
           echo "::set-output name=container_name::$TF_STATE_BLOB_CONTAINER_NAME"
           echo "::set-output name=key::$TF_STATE_BLOB_FILE"
+          echo "::set-output name=tf_actions_version::$(curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | jq -r '.tag_name' | sed 's/^v//')"
         id: azurerm
-      - name: 'Get latest Terraform GitHub release and remove "v" from tag name for version'
-        run: "echo ::set-output name=tf_actions_version::$(curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | jq -r '.tag_name' | sed 's/^v//')"
-        shell: bash
-        id: get_tf_latest
       - uses: actions/download-artifact@v3
         with:
           name: ${{github.run_id}}.apply.tfplan
       - name: "Terraform Init"
         uses: hashicorp/terraform-github-actions@master
         with:
-          tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
+          tf_actions_version: ${{ steps.azurerm.outputs.tf_actions_version }}
           tf_actions_subcommand: "init"
           tf_actions_working_dir: ${{github.workspace}}
           args: |
@@ -162,7 +171,7 @@ jobs:
         if: github.ref == 'refs/heads/dev'
         uses: hashicorp/terraform-github-actions@master
         with:
-          tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
+          tf_actions_version: ${{ steps.azurerm.outputs.tf_actions_version }}
           tf_actions_subcommand: "apply"
           tf_actions_working_dir: ${{github.workspace}}
           args: "-input=false -auto-approve ${{github.run_id}}.apply.tfplan"
@@ -193,4 +202,24 @@ jobs:
           echo "::set-output name=storage_account_name::$TF_STATE_BLOB_ACCOUNT_NAME"
           echo "::set-output name=container_name::$TF_STATE_BLOB_CONTAINER_NAME"
           echo "::set-output name=key::$TF_STATE_BLOB_FILE"
+          echo "::set-output name=tf_actions_version::$(curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | jq -r '.tag_name' | sed 's/^v//')"
         id: azurerm
+      - name: "Terraform Init"
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: ${{ steps.azurerm.outputs.tf_actions_version }}
+          tf_actions_subcommand: "init"
+          tf_actions_working_dir: ${{github.workspace}}
+          args: |
+            -backend-config="sas_token=${{ steps.azurerm.outputs.sas_token }}"
+            -backend-config="resource_group_name=${{ steps.azurerm.outputs.resource_group_name }}"
+            -backend-config="storage_account_name=${{ steps.azurerm.outputs.storage_account_name  }}"
+            -backend-config="container_name=${{ steps.azurerm.outputs.container_name }}"
+            -backend-config="key=${{ steps.azurerm.outputs.key }}"
+      - name: Terraform Destroy
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: ${{ steps.azurerm.outputs.tf_actions_version }}
+          tf_actions_subcommand: "apply"
+          tf_actions_working_dir: ${{github.workspace}}
+          args: "-destroy -input=false -auto-approve ${{github.run_id}}.destroy.tfplan"
