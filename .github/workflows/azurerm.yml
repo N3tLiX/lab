@@ -75,7 +75,7 @@ jobs:
             --account-name $TF_STATE_BLOB_ACCOUNT_NAME \
             --services b \
             --resource-types sco \
-            --expiry $END \
+            --expiry `date -u -d "30 minutes" '+%Y-%m-%dT%H:%MZ'` \
             --only-show-errors -o tsv)
         id: azurerm
 
