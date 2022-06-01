@@ -50,6 +50,7 @@ jobs:
           echo "GITHUB_RUN_ID : [$GITHUB_RUN_ID]"
           echo "GITHUB_ACTOR  : [$GITHUB_ACTOR]"
           echo "GITHUB_ENV    : [${{github.env}}]"
+          echo "GIT_WORKSPACE : [${{github.workspace}}]"
         env:
           SAS_TOKEN: ${{ steps.azurerm.outputs.SasToken }}
 
