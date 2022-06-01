@@ -52,6 +52,7 @@ env:
 
   terraform:
     name: "Terraform"
+    needs: [azurerm]    
     runs-on: ubuntu-latest
     environment: development
     env:
