@@ -3,3 +3,4 @@
   export TF_STATE_BLOB_ACCOUNT_NAME="tfstate20220602env"
   export TF_STATE_BLOB_ACCOUNT_SKU="Standard_LRS"
   export TF_STATE_BLOB_CONTAINER_NAME="exports"
+  export TF_STATE_BLOB_FILE="terraform.tfstate"

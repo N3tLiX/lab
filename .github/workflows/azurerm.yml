@@ -59,4 +59,7 @@ jobs:
       - name: Terraform Init
         run: terraform init
         env:
-          TF_STATE_BLOB_SAS_TOKEN: ${{ steps.azurerm.outputs.SasToken }}
+          ARM_SAS_TOKEN: ${{ steps.azurerm.outputs.SasToken }}
+          storage_account_name: $TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP
+          container_name: $TF_STATE_BLOB_CONTAINER_NAME
+          key: "terraform.tfstate"
