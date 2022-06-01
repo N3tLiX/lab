@@ -107,11 +107,11 @@ jobs:
           tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
           tf_actions_subcommand: "plan"
           tf_actions_working_dir: ${{github.workspace}}
-          args: "-input=false -out ${{github.run_id}}.tfplan"
+          args: "-input=false -out ${{github.run_id}}.apply.tfplan"
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{github.run_id}}.tfplan
-          path: ${{github.workspace}}/${{github.run_id}}.tfplan
+          name: ${{github.run_id}}.apply.tfplan
+          path: ${{github.workspace}}/${{github.run_id}}.apply.tfplan
 
   tf_apply:
     name: "Terraform [apply]"
@@ -145,7 +145,19 @@ jobs:
         id: get_tf_latest
       - uses: actions/download-artifact@v3
         with:
-          name: ${{github.run_id}}.tfplan
+          name: ${{github.run_id}}.apply.tfplan
+      - name: "Terraform Init"
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
+          tf_actions_subcommand: "init"
+          tf_actions_working_dir: ${{github.workspace}}
+          args: |
+            -backend-config="sas_token=${{ steps.azurerm.outputs.sas_token }}"
+            -backend-config="resource_group_name=${{ steps.azurerm.outputs.resource_group_name }}"
+            -backend-config="storage_account_name=${{ steps.azurerm.outputs.storage_account_name  }}"
+            -backend-config="container_name=${{ steps.azurerm.outputs.container_name }}"
+            -backend-config="key=${{ steps.azurerm.outputs.key }}"
       - name: Terraform Apply
         if: github.ref == 'refs/heads/dev'
         uses: hashicorp/terraform-github-actions@master
@@ -153,7 +165,7 @@ jobs:
           tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
           tf_actions_subcommand: "apply"
           tf_actions_working_dir: ${{github.workspace}}
-          args: "-input=false -auto-approve ${{github.run_id}}.tfplan"
+          args: "-input=false -auto-approve ${{github.run_id}}.apply.tfplan"
 
   tf_destroy:
     name: "Terraform [destroy]"
