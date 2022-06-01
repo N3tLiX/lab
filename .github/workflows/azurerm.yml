@@ -49,6 +49,7 @@ jobs:
           echo "GITHUB_ACTION : [$GITHUB_ACTION]"
           echo "GITHUB_RUN_ID : [$GITHUB_RUN_ID]"
           echo "GITHUB_ACTOR  : [$GITHUB_ACTOR]"
+          echo "GITHUB_ENV    : [${{github.env}}]""
         env:
           SAS_TOKEN: ${{ steps.azurerm.outputs.SasToken }}
 
@@ -65,7 +66,8 @@ jobs:
           az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
           az account set --subscription $ARM_SUBSCRIPTION_ID
           source ${{github.workspace}}/variables.sh
-          export TF_STATE_BLOB_SAS_TOKEN=$(az storage account generate-sas \
+          echo "TF_STATE_BLOB_ACCOUNT_NAME : [$TF_STATE_BLOB_ACCOUNT_NAME]"
+          echo ::set-output name=SasToken::$(az storage account generate-sas \
             --permissions cdlruwap \
             --account-name $TF_STATE_BLOB_ACCOUNT_NAME \
             --services b \
@@ -93,11 +95,11 @@ jobs:
           tf_actions_subcommand: "init"
           tf_actions_working_dir: ${{github.workspace}}
           args: |
-            -backend-config="sas_token=$TF_STATE_BLOB_SAS_TOKEN" 
+            -backend-config="sas_token=${{ steps.azurerm.outputs.SasToken }}"" 
             -backend-config="resource_group_name=$TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP"
             -backend-config="storage_account_name=$TF_STATE_BLOB_ACCOUNT_NAME"
             -backend-config="container_name=$TF_STATE_BLOB_CONTAINER_NAME"
-            -backend-config="key=${{github.env}}.$TF_STATE_BLOB_FILE"
+            -backend-config="key=$TF_STATE_BLOB_FILE"
           # args: |
           #   -backend-config="sas_token=${{ steps.azurerm.outputs.SasToken }}"
           #   -backend-config="resource_group_name=${{ env.TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP }}"
