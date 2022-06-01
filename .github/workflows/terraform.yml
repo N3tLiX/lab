@@ -129,6 +129,7 @@ jobs:
 
   tf_apply:
     name: "Terraform [apply]"
+    if: github.ref != 'refs/heads/destroy'
     needs: [azurerm, tf_plan]
     runs-on: ubuntu-latest
     environment: development
@@ -181,7 +182,7 @@ jobs:
   tf_destroy:
     name: "Terraform [destroy]"
     if: github.ref == 'refs/heads/destroy'
-    needs: [azurerm]
+    needs: [azurerm, tf_plan]
     runs-on: ubuntu-latest
     environment: development
 
