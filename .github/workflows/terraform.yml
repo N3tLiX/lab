@@ -4,8 +4,9 @@ on:
   push:
     branches:
       - dev
-      - destroy
   pull_request:
+    branches:
+        - destroy
     types: [closed]
 
 permissions:
@@ -115,7 +116,7 @@ jobs:
           tf_actions_version: ${{ steps.azurerm.outputs.tf_actions_version }}
           tf_actions_subcommand: "plan"
           tf_actions_working_dir: ${{github.workspace}}
-          args: "- destroy -input=false -out ${{github.run_id}}.destroy.tfplan"
+          args: "-destroy -input=false -out ${{github.run_id}}.destroy.tfplan"
       - uses: actions/upload-artifact@v3
         if: github.ref == 'refs/heads/dev'
         with:
