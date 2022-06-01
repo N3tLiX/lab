@@ -149,11 +149,11 @@ jobs:
       #     with:
       #         name: ${{github.run_id}}.tfplan
       #         path: ${{github.workspace}}/${{github.run_id}}.tfplan
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/dev'
-        uses: hashicorp/terraform-github-actions@master
-        with:
-          tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
-          tf_actions_subcommand: "apply"
-          tf_actions_working_dir: ${{github.workspace}}
-          args: "-input=false -auto-approve ${{github.run_id}}.tfplan"
+      # - name: Terraform Apply
+      #   if: github.ref == 'refs/heads/dev'
+      #   uses: hashicorp/terraform-github-actions@master
+      #   with:
+      #     tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
+      #     tf_actions_subcommand: "apply"
+      #     tf_actions_working_dir: ${{github.workspace}}
+      #     args: "-input=false -auto-approve ${{github.run_id}}.tfplan"
