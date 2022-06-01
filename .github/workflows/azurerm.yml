@@ -44,95 +44,95 @@ jobs:
       - name: "validate [azurerm]"
         shell: "/bin/bash {0}"
         run: |
-          echo "SAS_TOKEN     : [$SAS_TOKEN]"
-          echo "GITHUB_JOB    : [$GITHUB_JOB]"
-          echo "GITHUB_ACTION : [$GITHUB_ACTION]"
-          echo "GITHUB_RUN_ID : [$GITHUB_RUN_ID]"
-          echo "GITHUB_ACTOR  : [$GITHUB_ACTOR]"
-          echo "GITHUB_ENV    : [${{github.env}}]"
-          echo "GIT_WORKSPACE : [${{github.workspace}}]"
+          echo "SAS_TOKEN        : [$SAS_TOKEN]"
+          echo "GITHUB_JOB       : [$GITHUB_JOB]"
+          echo "GITHUB_ACTION    : [$GITHUB_ACTION]"
+          echo "GITHUB_RUN_ID    : [$GITHUB_RUN_ID]"
+          echo "GITHUB_ACTOR     : [$GITHUB_ACTOR]"
+          echo "GITHUB_ENV       : [${{github.env}}]"
+          echo "GITHUB_WORKSPACE : [${{github.workspace}}]"
         env:
           SAS_TOKEN: ${{ steps.azurerm.outputs.SasToken }}
 
-  terraform:
-    name: "Terraform"
-    needs: [azurerm]
-    runs-on: ubuntu-latest
-    environment: development
+  # terraform:
+  #   name: "Terraform"
+  #   needs: [azurerm]
+  #   runs-on: ubuntu-latest
+  #   environment: development
 
-    steps:
-      - name: "Set environment variables and get the SAS Token"
-        shell: "/bin/bash {0}"
-        run: |
-          az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
-          az account set --subscription $ARM_SUBSCRIPTION_ID
-          source ${{github.workspace}}/variables.sh
-          echo "TF_STATE_BLOB_ACCOUNT_NAME : [$TF_STATE_BLOB_ACCOUNT_NAME]"
-          echo ::set-output name=SasToken::$(az storage account generate-sas \
-            --permissions cdlruwap \
-            --account-name $TF_STATE_BLOB_ACCOUNT_NAME \
-            --services b \
-            --resource-types sco \
-            --expiry $END \
-            --only-show-errors -o tsv)
-        id: azurerm
+  #   steps:
+  #     - name: "Set environment variables and get the SAS Token"
+  #       shell: "/bin/bash {0}"
+  #       run: |
+  #         az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
+  #         az account set --subscription $ARM_SUBSCRIPTION_ID
+  #         source ${{github.workspace}}/variables.sh
+  #         echo "TF_STATE_BLOB_ACCOUNT_NAME : [$TF_STATE_BLOB_ACCOUNT_NAME]"
+  #         echo ::set-output name=SasToken::$(az storage account generate-sas \
+  #           --permissions cdlruwap \
+  #           --account-name $TF_STATE_BLOB_ACCOUNT_NAME \
+  #           --services b \
+  #           --resource-types sco \
+  #           --expiry $END \
+  #           --only-show-errors -o tsv)
+  #       id: azurerm
 
-      - name: 'Get latest Terraform GitHub release and remove "v" from tag name for version'
-        run: "echo ::set-output name=tf_actions_version::$(curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | jq -r '.tag_name' | sed 's/^v//')"
-        shell: bash
-        id: get_tf_latest
+  #     - name: 'Get latest Terraform GitHub release and remove "v" from tag name for version'
+  #       run: "echo ::set-output name=tf_actions_version::$(curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | jq -r '.tag_name' | sed 's/^v//')"
+  #       shell: bash
+  #       id: get_tf_latest
 
-      - name: "Terraform Format"
-        uses: hashicorp/terraform-github-actions@master
-        with:
-          tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
-          tf_actions_subcommand: "fmt"
-          tf_actions_working_dir: ${{github.workspace}}
+  #     - name: "Terraform Format"
+  #       uses: hashicorp/terraform-github-actions@master
+  #       with:
+  #         tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
+  #         tf_actions_subcommand: "fmt"
+  #         tf_actions_working_dir: ${{github.workspace}}
 
-      - name: "Terraform Init"
-        uses: hashicorp/terraform-github-actions@master
-        with:
-          tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
-          tf_actions_subcommand: "init"
-          tf_actions_working_dir: ${{github.workspace}}
-          args: |
-            -backend-config="sas_token=${{ steps.azurerm.outputs.SasToken }}"" 
-            -backend-config="resource_group_name=$TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP"
-            -backend-config="storage_account_name=$TF_STATE_BLOB_ACCOUNT_NAME"
-            -backend-config="container_name=$TF_STATE_BLOB_CONTAINER_NAME"
-            -backend-config="key=$TF_STATE_BLOB_FILE"
-          # args: |
-          #   -backend-config="sas_token=${{ steps.azurerm.outputs.SasToken }}"
-          #   -backend-config="resource_group_name=${{ env.TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP }}"
-          #   -backend-config="storage_account_name=${{ env.TF_STATE_BLOB_ACCOUNT_NAME }}"
-          #   -backend-config="container_name=${{ env.TF_STATE_BLOB_CONTAINER_NAME }}"
-          #   -backend-config="key=${{github.env}}.${{ env.TF_STATE_BLOB_FILE }}"
+  #     - name: "Terraform Init"
+  #       uses: hashicorp/terraform-github-actions@master
+  #       with:
+  #         tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
+  #         tf_actions_subcommand: "init"
+  #         tf_actions_working_dir: ${{github.workspace}}
+  #         args: |
+  #           -backend-config="sas_token=${{ steps.azurerm.outputs.SasToken }}""
+  #           -backend-config="resource_group_name=$TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP"
+  #           -backend-config="storage_account_name=$TF_STATE_BLOB_ACCOUNT_NAME"
+  #           -backend-config="container_name=$TF_STATE_BLOB_CONTAINER_NAME"
+  #           -backend-config="key=$TF_STATE_BLOB_FILE"
+  #         # args: |
+  #         #   -backend-config="sas_token=${{ steps.azurerm.outputs.SasToken }}"
+  #         #   -backend-config="resource_group_name=${{ env.TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP }}"
+  #         #   -backend-config="storage_account_name=${{ env.TF_STATE_BLOB_ACCOUNT_NAME }}"
+  #         #   -backend-config="container_name=${{ env.TF_STATE_BLOB_CONTAINER_NAME }}"
+  #         #   -backend-config="key=${{github.env}}.${{ env.TF_STATE_BLOB_FILE }}"
 
-      - name: "Terraform Validate"
-        uses: hashicorp/terraform-github-actions@master
-        with:
-          tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
-          tf_actions_subcommand: "validate"
-          tf_actions_working_dir: ${{github.workspace}}
+  #     - name: "Terraform Validate"
+  #       uses: hashicorp/terraform-github-actions@master
+  #       with:
+  #         tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
+  #         tf_actions_subcommand: "validate"
+  #         tf_actions_working_dir: ${{github.workspace}}
 
-      - name: "Terraform Plan"
-        uses: hashicorp/terraform-github-actions@master
-        with:
-          tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
-          tf_actions_subcommand: "plan"
-          tf_actions_working_dir: ${{github.workspace}}
-          args: "-input=false -out ${{github.run_id}}.tfplan"
+  #     - name: "Terraform Plan"
+  #       uses: hashicorp/terraform-github-actions@master
+  #       with:
+  #         tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
+  #         tf_actions_subcommand: "plan"
+  #         tf_actions_working_dir: ${{github.workspace}}
+  #         args: "-input=false -out ${{github.run_id}}.tfplan"
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ${{github.run_id}}.tfplan
-          path: ${{github.workspace}}/${{github.run_id}}.tfplan
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         name: ${{github.run_id}}.tfplan
+  #         path: ${{github.workspace}}/${{github.run_id}}.tfplan
 
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/dev'
-        uses: hashicorp/terraform-github-actions@master
-        with:
-          tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
-          tf_actions_subcommand: "apply"
-          tf_actions_working_dir: ${{github.workspace}}
-          args: "-input=false -auto-approve ${{github.run_id}}.tfplan"
+  #     - name: Terraform Apply
+  #       if: github.ref == 'refs/heads/dev'
+  #       uses: hashicorp/terraform-github-actions@master
+  #       with:
+  #         tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
+  #         tf_actions_subcommand: "apply"
+  #         tf_actions_working_dir: ${{github.workspace}}
+  #         args: "-input=false -auto-approve ${{github.run_id}}.tfplan"
