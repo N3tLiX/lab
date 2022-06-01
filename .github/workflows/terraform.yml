@@ -115,8 +115,8 @@ jobs:
           name: ${{github.run_id}}.tfplan
           path: ${{github.workspace}}/${{github.run_id}}.tfplan
 
-  tf_apply:
-    name: "Terraform [apply]"
+  apply:
+    name: "Terraform apply"
     needs: [azurerm, terraform]
     runs-on: ubuntu-latest
     environment: development
