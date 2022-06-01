@@ -139,19 +139,20 @@ jobs:
           echo "::set-output name=container_name::$TF_STATE_BLOB_CONTAINER_NAME"
           echo "::set-output name=key::$TF_STATE_BLOB_FILE"
         id: azurerm
-      - name: 'Get latest Terraform GitHub release and remove "v" from tag name for version'
-        run: "echo ::set-output name=tf_actions_version::$(curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | jq -r '.tag_name' | sed 's/^v//')"
-            shell: bash
-            id: get_tf_latest
-      - uses: actions/download-artifact@v3
-        with:
-            name: ${{github.run_id}}.tfplan
-            path: ${{github.workspace}}/${{github.run_id}}.tfplan
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/dev'
-        uses: hashicorp/terraform-github-actions@master
-        with:
-          tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
-          tf_actions_subcommand: "apply"
-          tf_actions_working_dir: ${{github.workspace}}
-          args: "-input=false -auto-approve ${{github.run_id}}.tfplan"
+
+      # - name: 'Get latest Terraform GitHub release and remove "v" from tag name for version'
+      #   run: "echo ::set-output name=tf_actions_version::$(curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | jq -r '.tag_name' | sed 's/^v//')"
+      #       shell: bash
+      #       id: get_tf_latest
+      # - uses: actions/download-artifact@v3
+      #   with:
+      #       name: ${{github.run_id}}.tfplan
+      #       path: ${{github.workspace}}/${{github.run_id}}.tfplan
+      # - name: Terraform Apply
+      #   if: github.ref == 'refs/heads/dev'
+      #   uses: hashicorp/terraform-github-actions@master
+      #   with:
+      #     tf_actions_version: ${{ steps.get_tf_latest.outputs.tf_actions_version }}
+      #     tf_actions_subcommand: "apply"
+      #     tf_actions_working_dir: ${{github.workspace}}
+      #     args: "-input=false -auto-approve ${{github.run_id}}.tfplan"
