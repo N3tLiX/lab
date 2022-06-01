@@ -49,7 +49,7 @@ jobs:
           echo "GITHUB_ACTION : [$GITHUB_ACTION]"
           echo "GITHUB_RUN_ID : [$GITHUB_RUN_ID]"
           echo "GITHUB_ACTOR  : [$GITHUB_ACTOR]"
-          echo "GITHUB_ENV    : [${{github.env}}]""
+          echo "GITHUB_ENV    : [${{github.env}}]"
         env:
           SAS_TOKEN: ${{ steps.azurerm.outputs.SasToken }}
 
