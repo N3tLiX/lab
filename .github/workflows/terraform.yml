@@ -47,8 +47,8 @@ jobs:
         env:
           SAS_TOKEN: ${{ steps.azurerm.outputs.SasToken }}
 
-  terraform:
-    name: "Terraform"
+  tf_plan:
+    name: "Terraform [plan]"
     needs: [azurerm]
     runs-on: ubuntu-latest
     environment: development
@@ -113,9 +113,9 @@ jobs:
           name: ${{github.run_id}}.tfplan
           path: ${{github.workspace}}/${{github.run_id}}.tfplan
 
-  apply:
-    name: "apply"
-    needs: [azurerm, terraform]
+  tf_apply:
+    name: "Terraform [apply]"
+    needs: [azurerm, tf_plan]
     runs-on: ubuntu-latest
     environment: development
 
