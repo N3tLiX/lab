@@ -70,7 +70,7 @@ jobs:
             -backend-config="resource_group_name=${{ env.TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP }}"
             -backend-config="storage_account_name=${{ env.TF_STATE_BLOB_ACCOUNT_NAME }}"
             -backend-config="container_name=${{ env.TF_STATE_BLOB_CONTAINER_NAME }}"
-            -backend-config="key=${{ env.TF_STATE_BLOB_FILE }}"
+            -backend-config="key=${{github.event_name}}.${{ env.TF_STATE_BLOB_FILE }}"
 
       - name: "Terraform Validate"
         uses: hashicorp/terraform-github-actions@master
@@ -85,12 +85,12 @@ jobs:
           tf_actions_version: 0.14.8
           tf_actions_subcommand: "plan"
           tf_actions_working_dir: ${{github.workspace}}
-          args: "-input=false -out $GITHUB_RUN_ID.tfplan"
+          args: "-input=false -out ${{github.run_id}}.tfplan"
 
       - uses: actions/upload-artifact@v3
         with:
-          name: $GITHUB_RUN_ID.tfplan
-          path: ${{github.workspace}}/$GITHUB_RUN_ID.tfplan
+          name: ${{github.run_id}}.tfplan
+          path: ${{github.workspace}}/${{github.run_id}}.tfplan
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/dev'
@@ -99,4 +99,4 @@ jobs:
           tf_actions_version: 0.14.8
           tf_actions_subcommand: "apply"
           tf_actions_working_dir: ${{github.workspace}}
-          args: "-input=false -auto-approve $GITHUB_RUN_ID.tfplan"
+          args: "-input=false -auto-approve ${{github.run_id}}.tfplan"
