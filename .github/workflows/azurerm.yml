@@ -9,6 +9,14 @@ on:
 permissions:
   contents: read
 
+env:
+  TF_STATE_BLOB_SUBSCRIPTION_NAME: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP: "rg-TERRAFORM-ENV"
+  TF_STATE_BLOB_ACCOUT_LOCATION: "westeurope"
+  TF_STATE_BLOB_ACCOUNT_NAME: "tfstate20220601env"
+  TF_STATE_BLOB_ACCOUNT_SKU: "Standard_LRS"
+  TF_STATE_BLOB_CONTAINER_NAME: "tfstate"
+
 jobs:
   azurerm:
     name: "Terraform Backend"
@@ -29,18 +37,22 @@ jobs:
           az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
           az account set --subscription $ARM_SUBSCRIPTION_ID
           source ${{github.workspace}}/scripts/azurerm.sh
-        env:
-          TF_STATE_BLOB_SUBSCRIPTION_NAME: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-          TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP: ${{ secrets.TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP }}
-          TF_STATE_BLOB_ACCOUT_LOCATION: ${{ secrets.TF_STATE_BLOB_ACCOUT_LOCATION }}
-          TF_STATE_BLOB_ACCOUNT_NAME: ${{ secrets.TF_STATE_BLOB_ACCOUNT_NAME }}
-          TF_STATE_BLOB_ACCOUNT_SKU: ${{ secrets.TF_STATE_BLOB_ACCOUNT_SKU }}
-          TF_STATE_BLOB_CONTAINER_NAME: ${{ secrets.TF_STATE_BLOB_CONTAINER_NAME }}
+        # env:
+        #   TF_STATE_BLOB_SUBSCRIPTION_NAME: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        #   TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP: ${{ secrets.TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP }}
+        #   TF_STATE_BLOB_ACCOUT_LOCATION: ${{ secrets.TF_STATE_BLOB_ACCOUT_LOCATION }}
+        #   TF_STATE_BLOB_ACCOUNT_NAME: ${{ secrets.TF_STATE_BLOB_ACCOUNT_NAME }}
+        #   TF_STATE_BLOB_ACCOUNT_SKU: ${{ secrets.TF_STATE_BLOB_ACCOUNT_SKU }}
+        #   TF_STATE_BLOB_CONTAINER_NAME: ${{ secrets.TF_STATE_BLOB_CONTAINER_NAME }}
         id: azurerm
 
       - name: "validate [azurerm]"
         shell: "/bin/bash {0}"
         run: |
-          echo -n "SAS_TOKEN : [$SAS_TOKEN]"
+          echo -n "SAS_TOKEN     : [$SAS_TOKEN]"
+          echo -n "GITHUB_JOB    : [$GITHUB_JOB]"
+          echo -n "GITHUB_ACTION : [$GITHUB_ACTION]"
+          echo -n "GITHUB_RUN_ID : [$GITHUB_RUN_ID]"
+          echo -n "GITHUB_ACTOR  : [$GITHUB_ACTOR]"
         env:
           SAS_TOKEN: ${{ steps.azurerm.outputs.SasToken }}
