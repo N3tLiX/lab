@@ -85,4 +85,9 @@ jobs:
           tf_actions_version: 0.14.8
           tf_actions_subcommand: "plan"
           tf_actions_working_dir: ${{github.workspace}}
-          args: "-out apply.tfplan"
+          args: "-input=false -out apply.tfplan"
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: apply.tfplan
+          path: ${{github.workspace}}/apply.tfplan
