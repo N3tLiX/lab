@@ -57,7 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: development
     env:
-      TF_STATE_BLOB_SAS_TOKEN: ${{ steps.azurerm.outputs.SasToken }}
+      TF_STATE_BLOB_SAS_TOKEN: ${{ jobs.azurerm.steps.azurerm.outputs.SasToken }}
 
     steps:
       - name: Checkout
