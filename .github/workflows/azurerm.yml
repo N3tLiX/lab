@@ -85,9 +85,18 @@ jobs:
           tf_actions_version: 0.14.8
           tf_actions_subcommand: "plan"
           tf_actions_working_dir: ${{github.workspace}}
-          args: "-input=false -out apply.tfplan"
+          args: "-input=false -out $GITHUB_RUN_ID.tfplan"
 
       - uses: actions/upload-artifact@v3
         with:
-          name: apply.tfplan
-          path: ${{github.workspace}}/apply.tfplan
+          name: $GITHUB_RUN_ID.tfplan
+          path: ${{github.workspace}}/$GITHUB_RUN_ID.tfplan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/dev'
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: 0.14.8
+          tf_actions_subcommand: "apply"
+          tf_actions_working_dir: ${{github.workspace}}
+          args: "-input=false -auto-approve $GITHUB_RUN_ID.tfplan"
