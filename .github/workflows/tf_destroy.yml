@@ -112,58 +112,6 @@ jobs:
           name: ${{github.run_id}}.destroy.tfplan
           path: ${{github.workspace}}/${{github.run_id}}.destroy.tfplan
 
-  tf_apply:
-    name: "Terraform [apply]"
-    if: github.event.pull_request.merged == true
-    needs: [azurerm, tf_plan]
-    runs-on: ubuntu-latest
-    environment: development
-
-    steps:
-      - uses: actions/checkout@v1
-      - name: "Set environment variables and get the SAS Token"
-        shell: "/bin/bash {0}"
-        run: |
-          az login --service-principal --username $ARM_CLIENT_ID --password $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
-          az account set --subscription $ARM_SUBSCRIPTION_ID
-          source ${{github.workspace}}/variables.sh
-          echo "::set-output name=sas_token::$(az storage account generate-sas \
-            --permissions cdlruwap \
-            --account-name $TF_STATE_BLOB_ACCOUNT_NAME \
-            --services b \
-            --resource-types sco \
-            --expiry `date -u -d "30 minutes" '+%Y-%m-%dT%H:%MZ'` \
-            --only-show-errors -o tsv)"
-          echo "::set-output name=resource_group::$TF_STATE_BLOB_ACCOUNT_RESOURCE_GROUP"
-          echo "::set-output name=storage_account_name::$TF_STATE_BLOB_ACCOUNT_NAME"
-          echo "::set-output name=container_name::$TF_STATE_BLOB_CONTAINER_NAME"
-          echo "::set-output name=key::$TF_STATE_BLOB_FILE"
-          echo "::set-output name=tf_actions_version::$(curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | jq -r '.tag_name' | sed 's/^v//')"
-        id: azurerm
-      - uses: actions/download-artifact@v3
-        with:
-          name: ${{github.run_id}}.apply.tfplan
-      - name: "Terraform Init"
-        uses: hashicorp/terraform-github-actions@master
-        with:
-          tf_actions_version: ${{ steps.azurerm.outputs.tf_actions_version }}
-          tf_actions_subcommand: "init"
-          tf_actions_working_dir: ${{github.workspace}}
-          args: |
-            -backend-config="sas_token=${{ steps.azurerm.outputs.sas_token }}"
-            -backend-config="resource_group_name=${{ steps.azurerm.outputs.resource_group_name }}"
-            -backend-config="storage_account_name=${{ steps.azurerm.outputs.storage_account_name  }}"
-            -backend-config="container_name=${{ steps.azurerm.outputs.container_name }}"
-            -backend-config="key=${{ steps.azurerm.outputs.key }}"
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/dev'
-        uses: hashicorp/terraform-github-actions@master
-        with:
-          tf_actions_version: ${{ steps.azurerm.outputs.tf_actions_version }}
-          tf_actions_subcommand: "apply"
-          tf_actions_working_dir: ${{github.workspace}}
-          args: "-input=false -auto-approve ${{github.run_id}}.apply.tfplan"
-
   tf_destroy:
     name: "Terraform [destroy]"
     if: github.event.pull_request.merged == true
