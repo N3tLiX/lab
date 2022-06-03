@@ -116,7 +116,7 @@ jobs:
   tf_apply:
     name: "Terraform [apply]"
     # if: github.event.pull_request.merged
-    needs: [azurerm, tf_plan]
+    needs: [tf_plan]
     runs-on: ubuntu-latest
     environment: development
 
@@ -157,7 +157,6 @@ jobs:
             -backend-config="container_name=${{ steps.azurerm.outputs.container_name }}"
             -backend-config="key=${{ steps.azurerm.outputs.key }}"
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/dev'
         uses: hashicorp/terraform-github-actions@master
         with:
           tf_actions_version: ${{ steps.azurerm.outputs.tf_actions_version }}
