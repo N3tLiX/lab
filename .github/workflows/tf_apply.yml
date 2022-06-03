@@ -1,8 +1,8 @@
 name: "Terraform Apply [tf_apply.yml]"
 
 on:
-#  push:
-#    branches: [ main ]
+  push:
+    branches: [ main ]
   pull_request:
     branches: [ main ]
     types: [closed]
@@ -19,7 +19,7 @@ env:
 jobs:
   azurerm:
     name: "Backend"
-    # if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: development
 
@@ -51,7 +51,7 @@ jobs:
 
   tf_plan:
     name: "Terraform [plan]"
-    # if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     needs: [azurerm]
     runs-on: ubuntu-latest
     environment: development
@@ -115,7 +115,7 @@ jobs:
 
   tf_apply:
     name: "Terraform [apply]"
-    # if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     needs: [azurerm, tf_plan]
     runs-on: ubuntu-latest
     environment: development
