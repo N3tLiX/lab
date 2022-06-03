@@ -1,8 +1,8 @@
 name: "Terraform Destroy [tf_destroy.yml]"
 
 on:
-  push:
-    branches: [ destroy ]
+#  push:
+#    branches: [ destroy ]
   pull_request:
     branches: [ destroy ]
     types: [closed]
