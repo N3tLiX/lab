@@ -1,8 +1,8 @@
 name: "Terraform Destroy [tf_destroy.yml]"
 
 on:
-  push:
-    branches: [ destroy ]
+#  push:
+#    branches: [ destroy ]
   pull_request:
     branches: [ destroy ]
     types: [closed]
@@ -19,7 +19,7 @@ env:
 jobs:
   azurerm:
     name: "Backend"
-    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: development
 
@@ -51,7 +51,7 @@ jobs:
 
   tf_plan:
     name: "Terraform [plan]"
-    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
     needs: [azurerm]
     runs-on: ubuntu-latest
     environment: development
@@ -116,7 +116,7 @@ jobs:
 
   tf_destroy:
     name: "Terraform [destroy]"
-    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
     needs: [azurerm, tf_plan]
     runs-on: ubuntu-latest
     environment: development
