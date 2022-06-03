@@ -19,7 +19,6 @@ env:
 jobs:
   azurerm:
     name: "Backend"
-    # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: development
 
@@ -51,7 +50,6 @@ jobs:
 
   tf_plan:
     name: "Terraform [plan]"
-    # if: github.event.pull_request.merged == true
     needs: [azurerm]
     runs-on: ubuntu-latest
     environment: development
@@ -102,7 +100,6 @@ jobs:
           tf_actions_subcommand: "validate"
           tf_actions_working_dir: ${{github.workspace}}
       - name: "Terraform Plan [destroy]"
-        if: github.ref == 'refs/heads/destroy'
         uses: hashicorp/terraform-github-actions@master
         with:
           tf_actions_version: ${{ steps.azurerm.outputs.tf_actions_version }}
@@ -116,8 +113,7 @@ jobs:
 
   tf_destroy:
     name: "Terraform [destroy]"
-    # if: github.event.pull_request.merged == true
-    needs: [azurerm, tf_plan]
+    needs: [tf_plan]
     runs-on: ubuntu-latest
     environment: development
 
