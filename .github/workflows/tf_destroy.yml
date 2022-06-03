@@ -1,10 +1,11 @@
-name: "Terraform Apply [tf_apply.yml]"
+name: "Terraform Destroy [tf_destroy.yml]"
 
 on:
   push:
-    branches:
-      - dev
+    branches: [ destroy ]
   pull_request:
+    branches: [ destroy ]
+    types: [closed]
 
 permissions:
   contents: read
@@ -18,6 +19,7 @@ env:
 jobs:
   azurerm:
     name: "Backend"
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     environment: development
 
@@ -49,6 +51,7 @@ jobs:
 
   tf_plan:
     name: "Terraform [plan]"
+    if: github.event.pull_request.merged == true
     needs: [azurerm]
     runs-on: ubuntu-latest
     environment: development
@@ -98,21 +101,22 @@ jobs:
           tf_actions_version: ${{ steps.azurerm.outputs.tf_actions_version }}
           tf_actions_subcommand: "validate"
           tf_actions_working_dir: ${{github.workspace}}
-      - name: "Terraform Plan [apply|"
+      - name: "Terraform Plan [destroy]"
+        if: github.ref == 'refs/heads/destroy'
         uses: hashicorp/terraform-github-actions@master
         with:
           tf_actions_version: ${{ steps.azurerm.outputs.tf_actions_version }}
           tf_actions_subcommand: "plan"
           tf_actions_working_dir: ${{github.workspace}}
-          args: "-input=false -out ${{github.run_id}}.apply.tfplan"
+          args: "-destroy -input=false -out ${{github.run_id}}.destroy.tfplan"
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{github.run_id}}.apply.tfplan
-          path: ${{github.workspace}}/${{github.run_id}}.apply.tfplan
+          name: ${{github.run_id}}.destroy.tfplan
+          path: ${{github.workspace}}/${{github.run_id}}.destroy.tfplan
 
-  tf_apply:
-    name: "Terraform [apply]"
-    if: github.ref != 'refs/heads/destroy'
+  tf_destroy:
+    name: "Terraform [destroy]"
+    if: github.event.pull_request.merged == true
     needs: [azurerm, tf_plan]
     runs-on: ubuntu-latest
     environment: development
@@ -140,7 +144,7 @@ jobs:
         id: azurerm
       - uses: actions/download-artifact@v3
         with:
-          name: ${{github.run_id}}.apply.tfplan
+          name: ${{github.run_id}}.destroy.tfplan
       - name: "Terraform Init"
         uses: hashicorp/terraform-github-actions@master
         with:
@@ -153,11 +157,10 @@ jobs:
             -backend-config="storage_account_name=${{ steps.azurerm.outputs.storage_account_name  }}"
             -backend-config="container_name=${{ steps.azurerm.outputs.container_name }}"
             -backend-config="key=${{ steps.azurerm.outputs.key }}"
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/dev'
+      - name: Terraform Destroy
         uses: hashicorp/terraform-github-actions@master
         with:
           tf_actions_version: ${{ steps.azurerm.outputs.tf_actions_version }}
           tf_actions_subcommand: "apply"
           tf_actions_working_dir: ${{github.workspace}}
-          args: "-input=false -auto-approve ${{github.run_id}}.apply.tfplan"
+          args: "-destroy -input=false -auto-approve ${{github.run_id}}.destroy.tfplan"
