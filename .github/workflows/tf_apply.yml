@@ -99,7 +99,6 @@ jobs:
           tf_actions_subcommand: "validate"
           tf_actions_working_dir: ${{github.workspace}}
       - name: "Terraform Plan [apply|"
-        if: github.ref == 'refs/heads/dev'
         uses: hashicorp/terraform-github-actions@master
         with:
           tf_actions_version: ${{ steps.azurerm.outputs.tf_actions_version }}
@@ -107,7 +106,6 @@ jobs:
           tf_actions_working_dir: ${{github.workspace}}
           args: "-input=false -out ${{github.run_id}}.apply.tfplan"
       - uses: actions/upload-artifact@v3
-        if: github.ref == 'refs/heads/dev'
         with:
           name: ${{github.run_id}}.apply.tfplan
           path: ${{github.workspace}}/${{github.run_id}}.apply.tfplan
