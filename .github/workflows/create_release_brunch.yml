@@ -65,7 +65,7 @@ jobs:
       with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           head: release/v${{ github.event.inputs.versionName }}
-          base: develop
+          base: dev
           title: v${{ github.event.inputs.versionName }} into develop
           reviewers: ${{ github.event.issue.user.login }}
           body: |
