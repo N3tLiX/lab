@@ -36,18 +36,18 @@ jobs:
         echo "::set-output name=commit::$(git rev-parse HEAD)"
     - name: Push new branch
       run: git push origin release/v${{ github.event.inputs.versionName }}
-    - name: Submit strings.xml for translation
-      uses: andstor/copycat-action@v3
-      with:
-        personal_token: ${{ secrets.ANDROID_I18N_PAT }}
-        src_path: resources/src/main/res/values/strings.xml
-        src_branch: release/v${{ github.event.inputs.versionName }}
-        dst_path: en/strings.xml
-        dst_owner: your-repo-owner
-        dst_repo_name: android-i18n
-        dst_branch: master
-        clean: true
-        commit_message: release/v${{ github.event.inputs.versionName }} BOT New Strings for translation submitted.
+    #- name: Submit strings.xml for translation
+    #  uses: andstor/copycat-action@v3
+    #  with:
+    #    personal_token: ${{ secrets.ANDROID_I18N_PAT }}
+    #    src_path: /.
+    #    src_branch: release/v${{ github.event.inputs.versionName }}
+    #    # dst_path: en/strings.xml
+    #    dst_owner: n3tlix
+    #    dst_repo_name: lab
+    #    dst_branch: main
+    #    clean: true
+    #    commit_message: release/v${{ github.event.inputs.versionName }} BOT New Strings for translation submitted.
     - name: Create pull request into main
       uses: thomaseizinger/create-pull-request@1.0.0
       with:
@@ -65,7 +65,7 @@ jobs:
       with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           head: release/v${{ github.event.inputs.versionName }}
-          base: develop
+          base: dev
           title: v${{ github.event.inputs.versionName }} into develop
           reviewers: ${{ github.event.issue.user.login }}
           body: |
