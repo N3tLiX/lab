@@ -42,7 +42,7 @@ jobs:
         personal_token: ${{ secrets.ANDROID_I18N_PAT }}
         src_path: resources/src/main/res/values/strings.xml
         src_branch: release/v${{ github.event.inputs.versionName }}
-        dst_path: en/strings.xml
+        # dst_path: en/strings.xml
         dst_owner: n3tlix
         dst_repo_name: lab
         dst_branch: main
