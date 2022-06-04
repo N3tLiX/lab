@@ -43,9 +43,9 @@ jobs:
         src_path: resources/src/main/res/values/strings.xml
         src_branch: release/v${{ github.event.inputs.versionName }}
         dst_path: en/strings.xml
-        dst_owner: your-repo-owner
-        dst_repo_name: android-i18n
-        dst_branch: master
+        dst_owner: n3tlix
+        dst_repo_name: lab
+        dst_branch: main
         clean: true
         commit_message: release/v${{ github.event.inputs.versionName }} BOT New Strings for translation submitted.
     - name: Create pull request into main
