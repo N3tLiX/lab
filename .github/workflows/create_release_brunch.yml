@@ -25,8 +25,8 @@ jobs:
       run: printf 'ext.version_code = ${{ github.event.inputs.versionCode }}\next.version_name = "${{ github.event.inputs.versionName }}"\n' > app_versions.gradle
     - name: Update Changelog
       uses: thomaseizinger/keep-a-changelog-new-release@v1
-      # with:
-      #   version: ${{ github.event.inputs.versionName }}
+      with:
+        version: ${{ github.event.inputs.versionName }}
     - name: Commit changelog and manifest files
       id: make-commit
       run: |
