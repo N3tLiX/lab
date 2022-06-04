@@ -63,7 +63,7 @@ jobs:
     - name: Create pull request to develop
       uses: thomaseizinger/create-pull-request@1.0.0
       with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.github-token }}
           head: release/v${{ github.event.inputs.versionName }}
           base: develop
           title: v${{ github.event.inputs.versionName }} into develop
