@@ -1,9 +1,16 @@
 name: Build
+
 on:
+  push:
+    branches:    
+      - main
+      - 'releases/**'
+  
   pull_request:
     branches:
       - main
-    types: [closed]
+      - 'releases/**'
+    types: [ closed ]
 
   workflow_dispatch: 
 
