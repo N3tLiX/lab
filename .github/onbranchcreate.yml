@@ -1,0 +1,10 @@
+on: create
+jobs:
+  job1:
+    if: ${{ contains(github.ref, 'refs/heads/releases/') }}
+  
+  job2:
+    if: ${{ contains(github.ref, 'refs/heads/releases/') }}
+
+  jobN:
+    if: ${{ contains(github.ref, 'refs/heads/releases/') }}
