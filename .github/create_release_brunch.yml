@@ -1,10 +1,14 @@
 name: Create Release Branch
 
 on:
-  push:
-    # Sequence of patterns matched against refs/tags
-    tags:
-    - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+  workflow_dispatch:
+    inputs:
+      versionName:
+        description: 'Name of version  (ie 5.5.0)'
+        required: true
+      versionCode:
+        description: 'Version number (50500)'
+        required: true
 
 jobs:
   createrelease:
@@ -32,7 +36,7 @@ jobs:
         git add CHANGELOG.md
         git commit --message "Prepare release ${{ github.event.inputs.versionName }}"
         echo "::set-output name=commit::$(git rev-parse HEAD)"
-    - name: Push new branch
+    - name: Push new release branch
       run: git push origin release/v${{ github.event.inputs.versionName }}
     - name: Create pull request into main
       uses: thomaseizinger/create-pull-request@1.0.0
@@ -46,6 +50,8 @@ jobs:
            Hi!
            This PR was created in response workflow running.
            I've updated the version name and code commit: ${{ steps.make-commit.outputs.commit }}.
+    - name: Push new develop branch
+      run: git push origin develop
     - name: Create pull request to develop
       uses: thomaseizinger/create-pull-request@1.0.0
       with:
