@@ -8,6 +8,8 @@ on:
       - 'tests/**'
       - 'LICENSE'
       - 'README.md'
+      - '*.gradle'
+      - '.gitignore'
   push:
     tags:
       - 'v*'
